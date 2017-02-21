@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray  } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-forms',
@@ -9,6 +9,8 @@ import { FormGroup, FormBuilder, FormControl, FormArray  } from '@angular/forms'
 export class FormsComponent  {
   orderSheetForm: FormGroup;
   weirdRequestsControls: FormArray;
+  showWelcomeMessage = false;
+  customerNameControl;
 
   constructor(private formBuilder: FormBuilder) {
     this.buildForm();
@@ -19,9 +21,15 @@ export class FormsComponent  {
     customerNameControl.setValue('Justin', {emitEvent: true});
   }*/
 
+  CordonBleuItem = {
+    name: 'Cordon Bleu',
+    size: 'large'
+  }
+
+
  private buildForm() {
     this.orderSheetForm = this.formBuilder.group({
-      customerName: this.formBuilder.control(null),
+      customerName: this.formBuilder.control(null, [Validators.required, Validators.minLength(2)]),
       size: this.formBuilder.control(null),
       bread: this.formBuilder.control(null),
       specialtySandwich: this.formBuilder.control(null),
@@ -46,6 +54,11 @@ export class FormsComponent  {
       }) 
     });
     this.weirdRequestsControls = this.orderSheetForm.get('weirdRequests') as FormArray;
+    this.customerNameControl = this.orderSheetForm.get('customerName');
+    this.customerNameControl.valueChanges
+      .subscribe(value => {
+        this.showWelcomeMessage = value && value.toLowerCase().trim() === 'justion s.';
+      });
   }
 
   onAddWeirRequest() {
